@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Commit;
-use App\Services\Github;
+use App\Models\SourceCodeEmbedding;
 use Illuminate\Http\Request;
 
-class CommitController extends Controller
+class SourceCodeEmbeddingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -35,7 +34,7 @@ class CommitController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Commit $commit)
+    public function show(SourceCodeEmbedding $sourceCodeEmbedding)
     {
         //
     }
@@ -43,7 +42,7 @@ class CommitController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Commit $commit)
+    public function edit(SourceCodeEmbedding $sourceCodeEmbedding)
     {
         //
     }
@@ -51,7 +50,7 @@ class CommitController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Commit $commit)
+    public function update(Request $request, SourceCodeEmbedding $sourceCodeEmbedding)
     {
         //
     }
@@ -59,16 +58,8 @@ class CommitController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Commit $commit)
+    public function destroy(SourceCodeEmbedding $sourceCodeEmbedding)
     {
         //
-    }
-
-    public function logs($project_id)
-    {
-        // $github = new Github();
-        // $github->pollCommits($project_id);
-        if(empty($project_id)) return "";
-        return Commit::where('project_id', $project_id)->get();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\AI\Gemini;
 use App\Models\Commit;
 use App\Models\Project;
+use App\Models\SourceCodeEmbedding;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 
@@ -78,6 +79,56 @@ class Github{
 
         Commit::insert($unprocessCommits);
         return $unprocessCommits;
+
+    }
+
+    public function indexGithubRepo($project_id,$githubToken="")
+    {
+        $project = Project::findOrFail($project_id);
+        
+        $docs = $this->loadGithubRepo($project->repoUrl,$githubToken);
+        
+        $gemini = new Gemini();
+
+        foreach($docs as $doc){
+            //dd($doc["metadata"]);
+            
+                $summary = $gemini->summerizeCode($doc);
+                $embedding = $gemini->generateEmbeddings($summary);
+                $scEmbedding = new SourceCodeEmbedding();
+                $scEmbedding->project_id = $project_id;
+                $scEmbedding->fileName = $doc['metadata']['source'];
+                $scEmbedding->sourceCode = $doc["content"];
+                $scEmbedding->summary = $summary;
+                $scEmbedding->summaryEmbedding = $embedding;
+                $scEmbedding->save();
+            
+        }
+        return true;
+    
+    }
+
+    public function loadGithubRepo($githubUrl, $githubToken="")
+    {
+        
+        ini_set('max_execution_time', '0');
+        
+        $loader = new GithubRepoLoader(
+            $githubUrl,
+            [
+                'accessToken' => $githubToken,
+                'branch' => 'main',
+                'recursive' => true,
+                // 'verbose' => true,
+                'ignoreFiles' => ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb'],
+                'unknown' => 'warn',
+                'maxConcurrency' => 5
+            ]
+        );
+        
+        $documents = $loader->load();
+
+        return $documents;
 
     }
 

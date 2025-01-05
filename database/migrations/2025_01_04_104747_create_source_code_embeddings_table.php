@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('commits', function (Blueprint $table) {
+        Schema::create('source_code_embeddings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->text("message");
-            $table->string("hash");
-            $table->string("authorName");
-            $table->string("authorAvatar");
-            $table->timestamp("date");
+            $table->string("fileName");
+            $table->text("sourceCode");
             $table->text("summary");
+            $table->vector('summaryEmbedding',768)->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('commits');
+        Schema::dropIfExists('source_code_embeddings');
     }
 };
