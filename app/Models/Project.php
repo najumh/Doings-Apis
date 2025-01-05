@@ -9,6 +9,7 @@ class Project extends Model
     protected $fillable = [
         'projectName',
         'repoUrl',
+        'branch',
         'githubToken'
     ];
 

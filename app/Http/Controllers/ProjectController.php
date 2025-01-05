@@ -42,6 +42,7 @@ class ProjectController extends Controller
         $newProject = $request->validate([
             'projectName' => 'required',
             'repoUrl' => 'required',
+            'branch' => 'required',
             'githubToken' => 'sometimes|nullable'
         ]);
 
@@ -100,10 +101,11 @@ class ProjectController extends Controller
         $question_vector =  $gemini->generateEmbeddings($question);
         $results = SourceCodeEmbedding::query()->nearestNeighbors('summaryEmbedding', $question_vector, Distance::L2)
                     ->where("project_id",$project_id)
+                    // ->where('relevance', '>', 0.5)
                     // ->whereRaw(DB::raw("neighbor_distance > .5"))
                     ->take(7)->get();
 
-        
+
         $content = "";
 
         foreach ($results as $result){

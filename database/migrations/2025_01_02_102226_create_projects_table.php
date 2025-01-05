@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('projectName');
+            $table->string('branch');
             $table->string('repoUrl');
             $table->string('githubToken')->nullable();
             $table->timestamp('deleted_at')->nullable();

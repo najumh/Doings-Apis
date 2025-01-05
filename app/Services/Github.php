@@ -67,7 +67,7 @@ class Github{
         $repoUrl = explode("/", $project->repoUrl); 
         $owner = $repoUrl[count($repoUrl)-2]; 
         $repo = $repoUrl[count($repoUrl)-1];
-        $commitHashes = $this->getCommits($owner,$repo);
+        $commitHashes = $this->getCommits($owner,$repo,$project->branch);
         $unprocessCommits = $this->filterUnprocessedCommits($project_id,$commitHashes);
 
         foreach($unprocessCommits as $key=>$commit){
@@ -86,7 +86,7 @@ class Github{
     {
         $project = Project::findOrFail($project_id);
         
-        $docs = $this->loadGithubRepo($project->repoUrl,$githubToken);
+        $docs = $this->loadGithubRepo($project->repoUrl,$project->branch,$githubToken);
         
         $gemini = new Gemini();
 
@@ -108,7 +108,7 @@ class Github{
     
     }
 
-    public function loadGithubRepo($githubUrl, $githubToken="")
+    public function loadGithubRepo($githubUrl, $branch="main", $githubToken="")
     {
         
         ini_set('max_execution_time', '0');
@@ -117,7 +117,7 @@ class Github{
             $githubUrl,
             [
                 'accessToken' => $githubToken,
-                'branch' => 'main',
+                'branch' => $branch,
                 'recursive' => true,
                 // 'verbose' => true,
                 'ignoreFiles' => ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb'],
